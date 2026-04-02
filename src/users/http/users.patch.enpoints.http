@@ -1,0 +1,7 @@
+PATCH http://localhost:3000/users
+Content-Type: application/json
+Authorization: Bearer 1234567890
+{ 
+    "email": "john.com",
+    "password": "A@a12345"
+}

@@ -1,0 +1,11 @@
+# Post Request for users controller
+
+POST http://localhost:3000/users
+Content-Type: application/json
+Authorization: Bearer 1234567890
+{ 
+    "firstName": "hitesh",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "A@a12345"
+}
