@@ -8,12 +8,13 @@ import {
   IsString,
   IsUrl,
   Matches,
+  MaxLength,
   MinLength,
   ValidateNested,
 } from 'class-validator';
 import { PostType } from '../enums/postType.enum';
 import { PostStatus } from '../enums/postStatus.enum';
-import { CreatePostMetaOptionsDto } from './create-post-meta-options.dto';
+import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-post-meta-options.dto';
 import { Type } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -25,8 +26,8 @@ export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(4)
+  @MaxLength(512)
   title: string;
-
 
   @ApiProperty({
     enum: PostType,
@@ -47,8 +48,8 @@ export class CreatePostDto {
     message:
       'Slug must be a valid slug with only lowercase letters, numbers and hyphens',
   })
+  @MaxLength(256)
   slug: string;
-
 
   @ApiProperty({
     enum: PostStatus,
@@ -69,7 +70,8 @@ export class CreatePostDto {
 
   @ApiPropertyOptional({
     description: 'The schema of the blog post',
-    example: '{ "type": "object", "properties": { "title": { "type": "string" } } }',
+    example:
+      '{ "type": "object", "properties": { "title": { "type": "string" } } }',
   })
   @IsJSON()
   @IsOptional()
@@ -81,6 +83,7 @@ export class CreatePostDto {
   })
   @IsOptional()
   @IsUrl()
+  @MaxLength(1024)
   featuredImage?: string;
 
   @ApiPropertyOptional({
@@ -105,20 +108,20 @@ export class CreatePostDto {
     type: 'array',
     required: false,
     items: {
-        type: 'object',
-        properties: {
-            key: {
-                type: 'string',
-                example: 'sidebarEnabled',
-                description: 'The key of the meta option',
-            },
-            value: {
-                type: 'any',
-                example: true,
-                description: 'The value of the meta option',
-            },
+      type: 'object',
+      properties: {
+        key: {
+          type: 'string',
+          example: 'sidebarEnabled',
+          description: 'The key of the meta option',
         },
-    }
+        value: {
+          type: 'any',
+          example: true,
+          description: 'The value of the meta option',
+        },
+      },
+    },
   })
   @IsOptional()
   @IsArray()
