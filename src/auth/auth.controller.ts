@@ -1,19 +1,12 @@
-import { Controller } from '@nestjs/common';
 import { AuthService } from './providers/auth.service';
+import { Controller } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
-
-    constructor(private readonly authService: AuthService) {}
-
-
-    public login(email: string , password: string, id: string)
-    {
-        return this.authService.login(email, password, id);
-    }
-
-    public isAuthenticated(token: string)
-    {
-        return true;
-    }
+  constructor(
+    /*
+     * Injecting Auth Service
+     */
+    private readonly authService: AuthService,
+  ) {}
 }

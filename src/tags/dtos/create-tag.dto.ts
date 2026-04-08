@@ -13,37 +13,34 @@ import {
 export class CreateTagDto {
   @ApiProperty()
   @IsString()
-  @IsNotEmpty()
   @MinLength(3)
+  @IsNotEmpty()
   @MaxLength(256)
   name: string;
 
-  @ApiProperty({
-    description: 'The slug of the blog post',
-    example: 'post-1',
-  })
+  @ApiProperty()
   @IsString()
   @IsNotEmpty()
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
     message:
-      'Slug must be a valid slug with only lowercase letters, numbers and hyphens',
+      'A slug should be all small letters and uses only "-" and without spaces. For example "my-url"',
   })
-  @MaxLength(256)
+  @MaxLength(512)
   slug: string;
 
   @ApiPropertyOptional()
-  @IsString()
   @IsOptional()
-  description?: string;
+  @IsString()
+  description: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsJSON()
-  schema?: string;
+  schema: string;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsUrl()
   @MaxLength(1024)
-  featuredImageUrl?: string;
+  featuredImage: string;
 }

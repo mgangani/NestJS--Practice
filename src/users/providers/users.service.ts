@@ -1,68 +1,81 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
 import { GetUsersParamDto } from '../dtos/get-users-param.dto';
-import { Repository } from 'typeorm';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  forwardRef,
+} from '@nestjs/common';
 import { User } from '../user.entity';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
+import { AuthService } from 'src/auth/providers/auth.service';
 
 /**
- * UsersService is a service that provides methods to get users from the database
+ * Controller class for '/users' API endpoint
  */
 @Injectable()
 export class UsersService {
   constructor(
+    /**
+     * Injecting User repository into UsersService
+     * */
     @InjectRepository(User)
-    private usersRepository: Repository<User>) {
-  }
+    private usersRepository: Repository<User>,
 
-  public async createUser( createUserDto: CreateUserDto){
-    const existingUSer = await this.usersRepository.findOne({
-      where: { email: createUserDto.email}
+    // Injecting Auth Service
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
+  ) {}
+
+  public async createUser(createUserDto: CreateUserDto) {
+    // Check if user with email exists
+    const existingUser = await this.usersRepository.findOne({
+      where: { email: createUserDto.email },
     });
-    if(existingUSer){
-      throw new BadRequestException('User already exists');
-    }
-    let newUSer = this.usersRepository.create(createUserDto);
-    return await this.usersRepository.save(newUSer);
+
+    /**
+     * Handle exceptions if user exists later
+     * */
+
+    // Try to create a new user
+    // - Handle Exceptions Later
+    let newUser = this.usersRepository.create(createUserDto);
+    newUser = await this.usersRepository.save(newUser);
+
+    // Create the user
+    return newUser;
   }
 
   /**
-   * Find all users
+   * Public method responsible for handling GET request for '/users' endpoint
    */
   public findAll(
-    getUsersParamDto: GetUsersParamDto,
+    getUserParamDto: GetUsersParamDto,
+    limt: number,
     page: number,
-    limit: number,
   ) {
     return [
       {
-        id: 1,
-        name: 'John Doe',
-        email: 'john.doe@example.com',
+        firstName: 'John',
+        email: 'john@doe.com',
       },
       {
-        id: 2,
-        name: 'Alice Doe',
-        email: 'alice.doe@example.com',
-      },
-      {
-        id: 3,
-        name: 'Bob Doe',
-        email: 'bob.doe@example.com',
+        firstName: 'Alice',
+        email: 'alice@doe.com',
       },
     ];
   }
 
   /**
-   * Find one user by id
-   * @param id - The id of the user
-   * @returns The user
+   * Public method used to find one user using the ID of the user
    */
   public findOneById(id: string) {
     return {
-      id: 1,
-      name: 'John Doe',
-      email: 'john.doe@example.com',
+      id: 1234,
+      firstName: 'Alice',
+      email: 'alice@doe.com',
     };
   }
 }

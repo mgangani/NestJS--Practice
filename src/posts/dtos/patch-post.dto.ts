@@ -1,10 +1,11 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsInt, IsNotEmpty } from 'class-validator';
+
 import { CreatePostDto } from './create-post.dto';
 
 export class PatchPostDto extends PartialType(CreatePostDto) {
   @ApiProperty({
-    description: 'The id of the blog post',
+    description: 'The ID of the post that needs to be updated',
   })
   @IsInt()
   @IsNotEmpty()

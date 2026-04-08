@@ -1,8 +1,15 @@
-import { User } from 'src/users/user.entity';
-import { PostType } from './enums/postType.enum';
-import { PostStatus } from './enums/postStatus.enum';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+
 import { CreatePostMetaOptionsDto } from '../meta-options/dtos/create-post-meta-options.dto';
+import { MetaOption } from 'src/meta-options/meta-option.entity';
+import { postStatus } from './enums/postStatus.enum';
+import { postType } from './enums/postType.enum';
 
 @Entity()
 export class Post {
@@ -18,11 +25,11 @@ export class Post {
 
   @Column({
     type: 'enum',
-    enum: PostType,
+    enum: postType,
     nullable: false,
-    default: PostType.POST,
+    default: postType.POST,
   })
-  postType: PostType;
+  postType: postType;
 
   @Column({
     type: 'varchar',
@@ -34,11 +41,11 @@ export class Post {
 
   @Column({
     type: 'enum',
-    enum: PostStatus,
+    enum: postStatus,
     nullable: false,
-    default: PostStatus.DRAFT,
+    default: postStatus.DRAFT,
   })
-  status: PostStatus;
+  status: postStatus;
 
   @Column({
     type: 'text',
@@ -47,7 +54,7 @@ export class Post {
   content?: string;
 
   @Column({
-    type: 'json',
+    type: 'text',
     nullable: true,
   })
   schema?: string;
@@ -57,24 +64,18 @@ export class Post {
     length: 1024,
     nullable: true,
   })
-  featuredImage?: string;
+  featuredImageUrl?: string;
 
   @Column({
-    type: 'timestamp',
+    type: 'timestamp', // 'datetime' in mysql
     nullable: true,
   })
-  publishedOn?: Date;
+  publishOn?: Date;
 
-  //   @Column({
-  //     type: 'array',
-  //     nullable: true,
-  //   })
-  //   tags?: string[];
+  @OneToOne(() => MetaOption)
+  @JoinColumn()
+  metaOptions?: MetaOption;
 
-  //   @Column({
-  //     type: 'array',
-  //     nullable: true,
-  //   })
-  //   metaOptions?: CreatePostMetaOptionsDto[];
-  //   author: User;
+  // Work on these in lecture on relationships
+  tags?: string[];
 }

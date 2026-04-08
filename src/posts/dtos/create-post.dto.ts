@@ -1,3 +1,4 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsArray,
   IsEnum,
@@ -9,94 +10,96 @@ import {
   IsUrl,
   Matches,
   MaxLength,
+  Min,
   MinLength,
   ValidateNested,
 } from 'class-validator';
-import { PostType } from '../enums/postType.enum';
-import { PostStatus } from '../enums/postStatus.enum';
+
 import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-post-meta-options.dto';
 import { Type } from 'class-transformer';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { postStatus } from '../enums/postStatus.enum';
+import { postType } from '../enums/postType.enum';
 
 export class CreatePostDto {
   @ApiProperty({
-    description: 'The title of the blog post',
-    example: 'string',
+    example: 'This is a title',
+    description: 'This is the title for the blog post',
   })
   @IsString()
-  @IsNotEmpty()
   @MinLength(4)
   @MaxLength(512)
+  @IsNotEmpty()
   title: string;
 
   @ApiProperty({
-    enum: PostType,
-    description: 'The type of the blog post',
-    example: PostType.POST,
+    enum: postType,
+    description: "Possible values, 'post', 'page', 'story', 'series'",
   })
-  @IsEnum(PostType)
+  @IsEnum(postType)
   @IsNotEmpty()
-  postType: PostType;
+  postType: postType;
 
   @ApiProperty({
-    description: 'The slug of the blog post',
-    example: 'post-1',
+    description: "For Example - 'my-url'",
+    example: 'my-blog-post',
   })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(256)
+  @MinLength(4)
   @Matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
     message:
-      'Slug must be a valid slug with only lowercase letters, numbers and hyphens',
+      'A slug should be all small letters and uses only "-" and without spaces. For example "my-url"',
   })
-  @MaxLength(256)
   slug: string;
 
   @ApiProperty({
-    enum: PostStatus,
-    description: 'The status of the blog post',
-    example: PostStatus.DRAFT,
+    enum: postStatus,
+    description: "Possible values 'draft', 'scheduled', 'review', 'published'",
   })
-  @IsEnum(PostStatus)
+  @IsEnum(postStatus)
   @IsNotEmpty()
-  status: PostStatus;
+  status: postStatus;
 
   @ApiPropertyOptional({
-    description: 'The content of the blog post',
-    example: 'string',
+    description: 'This is the content of the post',
+    example: 'The post content',
   })
   @IsString()
   @IsOptional()
   content?: string;
 
   @ApiPropertyOptional({
-    description: 'The schema of the blog post',
+    description:
+      'Serialize your JSON object else a validation error will be thrown',
     example:
-      '{ "type": "object", "properties": { "title": { "type": "string" } } }',
+      '{\r\n "@context": "https://schema.org",\r\n "@type": "Person"\r\n }',
   })
-  @IsJSON()
   @IsOptional()
+  @IsJSON()
   schema?: string;
 
   @ApiPropertyOptional({
-    description: 'The featured image of the blog post',
-    example: 'https://example.com/image.jpg',
+    description: 'Featured image for your blog post',
+    example: 'http://localhost.com/images/image1.jpg',
   })
   @IsOptional()
-  @IsUrl()
+  @MinLength(4)
   @MaxLength(1024)
-  featuredImage?: string;
+  @IsUrl()
+  featuredImageUrl?: string;
 
   @ApiPropertyOptional({
-    description: 'The published on date of the blog post',
-    example: '2026-01-01',
+    description: 'The date on which the blog post is published',
+    example: '2024-03-16T07:46:32+0000',
   })
   @IsISO8601()
   @IsOptional()
-  publishedOn?: Date;
+  publishOn?: Date;
 
   @ApiPropertyOptional({
-    description: 'The tags of the blog post',
-    example: ['tag1', 'tag2'],
+    description: 'Array of tags passed as string values',
+    example: ['nestjs', 'typescript'],
   })
   @IsOptional()
   @IsArray()
@@ -105,27 +108,11 @@ export class CreatePostDto {
   tags?: string[];
 
   @ApiPropertyOptional({
-    type: 'array',
-    required: false,
-    items: {
-      type: 'object',
-      properties: {
-        key: {
-          type: 'string',
-          example: 'sidebarEnabled',
-          description: 'The key of the meta option',
-        },
-        value: {
-          type: 'any',
-          example: true,
-          description: 'The value of the meta option',
-        },
-      },
-    },
+    type: () => CreatePostMetaOptionsDto,
+    description: 'Optional meta options payload',
   })
   @IsOptional()
-  @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreatePostMetaOptionsDto)
-  metaOptions?: CreatePostMetaOptionsDto[];
+  metaOptions?: CreatePostMetaOptionsDto | null;
 }

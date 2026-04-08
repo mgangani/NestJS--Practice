@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -15,7 +15,7 @@ export class User {
   @Column({
     type: 'varchar',
     length: 96,
-    nullable: true,
+    nullable: false,
   })
   lastName: string;
 
