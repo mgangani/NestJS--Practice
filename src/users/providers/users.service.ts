@@ -11,6 +11,9 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { AuthService } from 'src/auth/providers/auth.service';
+import { ConfigService } from '@nestjs/config';
+import type { ConfigType } from '@nestjs/config';
+import profileConfiguration from '../config/profile.config';
 
 /**
  * Controller class for '/users' API endpoint
@@ -24,9 +27,8 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
 
-    // Injecting Auth Service
-    @Inject(forwardRef(() => AuthService))
-    private readonly authService: AuthService,
+    @Inject(profileConfiguration.KEY)
+    private readonly profileConfig: ConfigType<typeof profileConfiguration>,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
@@ -56,6 +58,7 @@ export class UsersService {
     limt: number,
     page: number,
   ) {
+    console.log(this.profileConfig);
     return [
       {
         firstName: 'John',
