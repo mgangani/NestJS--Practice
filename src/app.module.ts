@@ -7,6 +7,7 @@ import { PostsModule } from './posts/posts.module';
 import { Tag } from './tags/tag.entity';
 import { TagsModule } from './tags/tags.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 /**
  * Importing Entities
  * */
@@ -18,6 +19,9 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     PostsModule,
     AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRootAsync({
       imports: [],
       inject: [],
