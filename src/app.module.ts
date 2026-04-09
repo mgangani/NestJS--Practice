@@ -6,10 +6,10 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import appConfig from './config/app.config';
 import databseConfig from './config/databse.config';
+import environmentValidationSchema from './config/environment.validation';
 import { MetaOptionsModule } from './meta-options/meta-options.module';
 import { PostsModule } from './posts/posts.module';
 import { TagsModule } from './tags/tags.module';
-import environmentValidationSchema from './config/environment.validation';
 /**
  * Importing Entities
  * */
