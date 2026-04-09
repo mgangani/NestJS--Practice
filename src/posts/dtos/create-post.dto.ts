@@ -20,6 +20,7 @@ import { CreatePostMetaOptionsDto } from '../../meta-options/dtos/create-post-me
 import { Type } from 'class-transformer';
 import { postStatus } from '../enums/postStatus.enum';
 import { postType } from '../enums/postType.enum';
+import { Tag } from 'src/tags/tag.entity';
 
 export class CreatePostDto {
   @ApiProperty({
@@ -100,13 +101,12 @@ export class CreatePostDto {
 
   @ApiPropertyOptional({
     description: 'Array of tags passed as string values',
-    example: ['nestjs', 'typescript'],
+    example: [1, 2],
   })
   @IsOptional()
   @IsArray()
-  @IsString({ each: true })
-  @MinLength(3, { each: true })
-  tags?: string[];
+  @IsInt({ each: true })
+  tags?: number[];
 
   @ApiPropertyOptional({
     type: () => CreatePostMetaOptionsDto,

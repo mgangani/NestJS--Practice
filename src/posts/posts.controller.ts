@@ -43,7 +43,7 @@ export class PostsController {
   })
   @Patch()
   public updatePost(@Body() patchPostsDto: PatchPostDto) {
-    console.log(patchPostsDto);
+    return this.postsService.update(patchPostsDto);
   }
 
   @ApiOperation({
@@ -57,5 +57,4 @@ export class PostsController {
   public deletePost(@Query('id', ParseIntPipe) id: number) {
     return this.postsService.delete(id);
   }
-
 }
