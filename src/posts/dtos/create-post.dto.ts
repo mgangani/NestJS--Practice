@@ -112,7 +112,7 @@ export class CreatePostDto {
     description: 'Optional meta options payload',
   })
   @IsOptional()
-  @ValidateNested({ each: true })
+  @ValidateNested()
   @Type(() => CreatePostMetaOptionsDto)
   metaOptions?: CreatePostMetaOptionsDto | null;
 }

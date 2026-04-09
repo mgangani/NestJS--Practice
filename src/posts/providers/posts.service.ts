@@ -1,6 +1,5 @@
 import { CreatePostDto } from '../dtos/create-post.dto';
 import { Injectable } from '@nestjs/common';
-import { MetaOptionsService } from './../../meta-options/meta-options.service';
 import { UsersService } from 'src/users/providers/users.service';
 import { Repository } from 'typeorm';
 import { Post } from '../post.entity';
@@ -56,20 +55,15 @@ export class PostsService {
     return await this.postsRepository.save(post);
   }
 
-  public findAll(userId: string) {
-    const user = this.usersService.findOneById(userId);
+  public async findAll(userId: string) {
+    // find all posts
+    let posts = await this.postsRepository.find();
 
-    return [
-      {
-        user: user,
-        title: 'Test Tile',
-        content: 'Test Content',
-      },
-      {
-        user: user,
-        title: 'Test Tile 2',
-        content: 'Test Content 2',
-      },
-    ];
+    return posts;
+  }
+
+  public async delete(id: number) {
+    await this.postsRepository.delete(id);
+    return { message: 'Post deleted successfully', postId: id };
   }
 }
