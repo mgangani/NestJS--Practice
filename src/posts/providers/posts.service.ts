@@ -1,5 +1,5 @@
 import { CreatePostDto } from '../dtos/create-post.dto';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersService } from 'src/users/providers/users.service';
 import { Repository } from 'typeorm';
 import { Post } from '../post.entity';
@@ -31,26 +31,24 @@ export class PostsService {
    * Method to create a new post
    */
   public async create(createPostDto: CreatePostDto) {
-    const { metaOptions: metaOptionsDto, ...postData } = createPostDto;
 
-    // Create the metaOptions first if they exist
-    let metaOptions = metaOptionsDto
-      ? this.metaOptionsRepository.create(metaOptionsDto)
-      : null;
+    let author = await this.usersService.findOneById(createPostDto.authorId);
 
-    if (metaOptions) {
-      await this.metaOptionsRepository.save(metaOptions);
+    if (!author) {
+      throw new NotFoundException(
+        `User with id ${createPostDto.authorId} not found`,
+      );
     }
-
-    // Create the post
+    const { authorId, metaOptions, tags, ...postFields } = createPostDto;
     let post = this.postsRepository.create({
-      ...postData,
+      ...postFields,
+      author: author,
+      ...(metaOptions != null && {
+        metaOptions: this.metaOptionsRepository.create({
+          metaValue: metaOptions.metaValue,
+        }),
+      }),
     });
-
-    // If meta options exist add them to post
-    if (metaOptions) {
-      post.metaOptions = metaOptions;
-    }
 
     return await this.postsRepository.save(post);
   }
