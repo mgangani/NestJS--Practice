@@ -3,11 +3,10 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   ParseIntPipe,
   Patch,
   Post,
-  Query,
+  Query
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from './dtos/create-post.dto';
@@ -28,15 +27,13 @@ export class PostsController {
   /*
    * GET localhost:3000/posts/:userId
    */
-  @Get('/{:userId}')
+  @Get()
   public getPosts(
-    @Param('userId') userId: string,
     @Query() postQuery: GetPostsDto,
+    @Query('userId') userId?: string | undefined,
   ) {
-    console.log(postQuery);
-    return this.postsService.findAll(userId);
+    return this.postsService.findAll(postQuery, userId);
   }
-
   @ApiOperation({
     summary: 'Creates a new blog post',
   })
