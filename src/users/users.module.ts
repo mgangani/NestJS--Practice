@@ -7,10 +7,11 @@ import profileConfig from './config/profile.config';
 import { UsersService } from './providers/users.service';
 import { User } from './user.entity';
 import { UsersController } from './users.controller';
+import { UsersCreateManyProvider } from './providers/users-create-many.provider';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, UsersCreateManyProvider],
   exports: [UsersService],
   imports: [
     TypeOrmModule.forFeature([User]),

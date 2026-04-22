@@ -13,6 +13,8 @@ import profileConfiguration from '../config/profile.config';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { GetUsersParamDto } from '../dtos/get-users-param.dto';
 import { User } from '../user.entity';
+import { UsersCreateManyProvider } from './users-create-many.provider';
+import { CreateManyUsersDto } from '../dtos/create-many-users.dto';
 
 /**
  * Controller class for '/users' API endpoint
@@ -28,6 +30,8 @@ export class UsersService {
 
     @Inject(profileConfiguration.KEY)
     private readonly profileConfig: ConfigType<typeof profileConfiguration>,
+
+    private readonly usersCreateManyProvider : UsersCreateManyProvider,
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
@@ -91,7 +95,7 @@ export class UsersService {
       {
         cause: new Error(),
         description: 'Occured because the api endpoint was permanently moved',
-      }
+      },
     );
   }
 
@@ -117,5 +121,9 @@ export class UsersService {
       throw new BadRequestException('user id does not exist');
     }
     return user;
+  }
+
+  public async createMany(createManyUsersDto: CreateManyUsersDto) {
+    return await this.usersCreateManyProvider.createMany(createManyUsersDto);
   }
 }
