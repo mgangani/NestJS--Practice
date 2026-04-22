@@ -3,4 +3,4 @@
   startDate = date;
   endDate = date;
 }}
-GET http://localhost:3000/posts/?startDate={{startDate}}&endDate={{endDate}}&limit=2&page=1
+GET http://localhost:3000/posts/?startDate={{startDate}}&endDate={{endDate}}&limit=100&page=1
