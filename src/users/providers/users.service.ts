@@ -1,19 +1,18 @@
-import { GetUsersParamDto } from '../dtos/get-users-param.dto';
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Inject,
   Injectable,
-  InternalServerErrorException,
-  forwardRef,
+  RequestTimeoutException,
 } from '@nestjs/common';
-import { User } from '../user.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { CreateUserDto } from '../dtos/create-user.dto';
-import { AuthService } from 'src/auth/providers/auth.service';
-import { ConfigService } from '@nestjs/config';
 import type { ConfigType } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import profileConfiguration from '../config/profile.config';
+import { CreateUserDto } from '../dtos/create-user.dto';
+import { GetUsersParamDto } from '../dtos/get-users-param.dto';
+import { User } from '../user.entity';
 
 /**
  * Controller class for '/users' API endpoint
@@ -32,19 +31,42 @@ export class UsersService {
   ) {}
 
   public async createUser(createUserDto: CreateUserDto) {
-    // Check if user with email exists
-    const existingUser = await this.usersRepository.findOne({
-      where: { email: createUserDto.email },
-    });
+    let existingUser: User | null = null;
+    try {
+      existingUser = await this.usersRepository.findOne({
+        where: { email: createUserDto.email },
+      });
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment please try later',
+        {
+          description: 'Error Connecting to the database',
+        },
+      );
+    }
 
     /**
      * Handle exceptions if user exists later
      * */
 
+    if (existingUser) {
+      throw new BadRequestException(
+        'The user already exists, please check your email',
+      );
+    }
     // Try to create a new user
     // - Handle Exceptions Later
     let newUser = this.usersRepository.create(createUserDto);
-    newUser = await this.usersRepository.save(newUser);
+    try {
+      newUser = await this.usersRepository.save(newUser);
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment please try later',
+        {
+          description: 'Error Connecting to the database',
+        },
+      );
+    }
 
     // Create the user
     return newUser;
@@ -58,23 +80,42 @@ export class UsersService {
     limt: number,
     page: number,
   ) {
-    console.log(this.profileConfig);
-    return [
+    throw new HttpException(
       {
-        firstName: 'John',
-        email: 'john@doe.com',
+        status: HttpStatus.MOVED_PERMANENTLY,
+        error: 'The api endpoint does not exist',
+        fileName: 'users.service.ts',
+        lineNumber: 88,
       },
+      HttpStatus.MOVED_PERMANENTLY,
       {
-        firstName: 'Alice',
-        email: 'alice@doe.com',
-      },
-    ];
+        cause: new Error(),
+        description: 'Occured because the api endpoint was permanently moved',
+      }
+    );
   }
 
   /**
    * Public method used to find one user using the ID of the user
    */
-  public findOneById(id: number) {
-    return this.usersRepository.findOneBy({ id });
+  public async findOneById(id: number) {
+    let user: User | null = null;
+    try {
+      user = await this.usersRepository.findOneBy({
+        id,
+      });
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'Unable to process your request at the moment please try later',
+        {
+          description: 'Error Connecting to the database',
+        },
+      );
+    }
+
+    if (!user) {
+      throw new BadRequestException('user id does not exist');
+    }
+    return user;
   }
 }

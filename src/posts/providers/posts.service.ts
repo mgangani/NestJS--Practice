@@ -1,7 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  RequestTimeoutException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MetaOption } from 'src/meta-options/meta-option.entity';
 import { TagsService } from 'src/tags/provider/tags.service';
+import { Tag } from 'src/tags/tag.entity';
 import { UsersService } from 'src/users/providers/users.service';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from '../dtos/create-post.dto';
@@ -78,10 +84,31 @@ export class PostsService {
   }
 
   public async update(patchPostDto: PatchPostDto) {
-    let tags = await this.tagsService.findMultipleTags(patchPostDto.tags ?? []);
-    let post = await this.postsRepository.findOneBy({
-      id: patchPostDto.id,
-    });
+    let tags: Tag[] | null = null;
+    let post: Post | null = null;
+
+    try {
+      tags = await this.tagsService.findMultipleTags(patchPostDto.tags ?? []);
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'unable to process your request at the moment please try again',
+      );
+    }
+    if (!tags || tags.length !== patchPostDto.tags?.length) {
+      throw new BadRequestException(
+        'please check your tag ids and ensure they are correct.',
+      );
+    }
+
+    try {
+      post = await this.postsRepository.findOneBy({
+        id: patchPostDto.id,
+      });
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'unable to process your request at the moment please try again',
+      );
+    }
     if (!post) {
       throw new NotFoundException(`Post with id ${patchPostDto.id} not found`);
     }
@@ -98,7 +125,15 @@ export class PostsService {
     //   metaValue: patchPostDto.metaOptions?.metaValue ?? post!.metaOptions?.metaValue,
     //  });
     post!.tags = tags;
-    return await this.postsRepository.save(post!);
+
+    try {
+      await this.postsRepository.save(post!);
+    } catch (error) {
+      throw new RequestTimeoutException(
+        'unable to process your request at the moment please try again',
+      );
+    }
+    return post;
   }
 
   public async delete(id: number) {
