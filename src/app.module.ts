@@ -14,6 +14,7 @@ import { TagsModule } from './tags/tags.module';
  * Importing Entities
  * */
 import { UsersModule } from './users/users.module';
+import { PaginationModule } from './common/pagination/pagination.module';
 
 const ENV = process.env.NODE_ENV;
 
@@ -48,6 +49,7 @@ const ENV = process.env.NODE_ENV;
     }),
     TagsModule,
     MetaOptionsModule,
+    PaginationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
